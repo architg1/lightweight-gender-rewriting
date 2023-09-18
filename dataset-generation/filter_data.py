@@ -1,8 +1,8 @@
-from collections import Counter, defaultdict
 import re
 import spacy
-import matplotlib.pyplot as plt
 import pandas as pd
+from smart_convert import convert
+from datasets import load_dataset
 
 nlp = spacy.load("en_core_web_sm")
 
@@ -26,21 +26,30 @@ def process_entry(text): # for each entry
     for sentence in sentences: # for each sentence
         if is_gendered(sentence.text) is True: # if the sentence fulfils our criteria
             processed_text.append(sentence.text)  # then add it back
-    return ';;'.join(processed_text) # return all sentences that fit our criteria
+    return 'EoS;'.join(processed_text) # return all sentences that fit our criteria
+
+def split_and_add_sentences(text, df):
+    sentences = text.split("EoS;")
+    for sentence in sentences:
+        df.loc[len(df)] = sentence.strip()
 
 # Load dataset
-dataset = load_dataset("wikipedia", "20220301.en")
-dataset['text (string)'] = dataset['text (string)'].apply(process_entry)
+dataset = load_dataset("wikipedia", "20220301.simple")
+dataset = dataset['train']
+dataset = pd.DataFrame(dataset)
+print(dataset.head(n=5))
 
-"""
-gendered_dataset = []
+print('Number of articles: ', len(dataset))
+dataset['text'] = dataset['text'].apply(process_entry)
 
-articles = dataset['text (string)']
-for article in articles:
-    sentences = nlp(article)
-    for sentence in sentences:
-        if is_gendered(sentence) is True:
-            gendered_dataset.append(sentence)
+# Generate the biased corpus
+corpus = pd.DataFrame(columns=["biased"])
+dataset.map(split_and_add_sentences)
+corpus.reset_index(drop=True, inplace=True)
+pd.display(corpus)
 
-gendered_dataset = pd.DataFrame({"gendered_sentence": gendered_dataset})
-"""
+# Generate the unbiased corpus
+corpus['unbiased'] = corpus['biased'].apply(convert)
+
+# Save the corpus
+corpus.to_csv('wikipedia_corpus', index=False)
