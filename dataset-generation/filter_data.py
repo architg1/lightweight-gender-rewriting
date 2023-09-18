@@ -38,9 +38,11 @@ dataset = load_dataset("wikipedia", "20220301.simple")
 dataset = dataset['train']
 dataset = pd.DataFrame(dataset)
 print(dataset.head(n=5))
-
 print('Number of articles: ', len(dataset))
+
+print('processing entries started')
 dataset['text'] = dataset['text'].apply(process_entry)
+print('processing entries finished')
 
 # Generate the biased corpus
 corpus = pd.DataFrame(columns=["biased"])
