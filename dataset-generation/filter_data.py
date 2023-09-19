@@ -34,7 +34,7 @@ def split_and_add_sentences(text, df):
         df.loc[len(df)] = [sentence.strip()]
 
 # Load dataset
-dataset = load_dataset("wikipedia", "20220301.simple")
+dataset = load_dataset("wikipedia", "20220301.simple") # dataset version
 dataset = dataset['train']
 dataset = pd.DataFrame(dataset)
 print('Number of articles: ', len(dataset))
@@ -47,13 +47,12 @@ dataset['text'] = dataset['text'].apply(process_entry)
 corpus = pd.DataFrame(columns=["biased"])
 dataset['text'].map(lambda x: split_and_add_sentences(x, corpus))
 corpus.reset_index(drop=True, inplace=True)
-print('Number of sentences: ', len(corpus))
-print(corpus.head(n=5))
-corpus.to_csv('wikipedia_biased_corpus.csv', index=False)
 
 # Convert biased text into unbiased text
 corpus['unbiased'] = corpus['biased'].apply(convert)
-print(len(corpus))
+print('Number of sentences: ', len(corpus))
+print(corpus.head(n=20))
 
 # Save the corpus
-corpus.to_csv('wikipedia_unbiased_corpus.csv', index=False)
+corpus.to_csv('/Users/architg/Documents/GitHub/final-year-project/data/wikipedia_corpus.csv', index=False)
+print('Corpus generated!')
