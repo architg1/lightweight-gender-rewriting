@@ -328,12 +328,13 @@ def pluralize_verbs(verbs_auxiliaries: dict) -> dict:
     return verbs_replacements
 
 
+# Outdated version (v2)
+"""
 def pluralize_single_verb(verb: Token):
-    """
-    pluralize a single verb
-    :param verb: verb as a SpaCy token
-    :return: the plural form of the verb as a str, or None if verb doesn't lend itself to pluralization
-    """
+    # pluralize a single verb
+    # :param verb: verb as a SpaCy token
+    # :return: the plural form of the verb as a str, or None if verb doesn't lend itself to pluralization
+    
     verb_text = verb.text
 
     # check verb tense (expect to be either past simple or present simple)
@@ -357,7 +358,38 @@ def pluralize_single_verb(verb: Token):
                                      replacement=pluralize_present_simple(verb_text))
 
     return None
+"""
 
+# New version (v3)
+def pluralize_single_verb(verb: Token):
+    # pluralize a single verb
+    # :param verb: verb as a SpaCy token
+    # :return: the plural form of the verb as a str, or None if verb doesn't lend itself to pluralization
+    
+    verb_text = verb.text
+
+    # check verb tense (expect to be either past simple or present simple)
+    pos_tag = verb.pos_
+    fine_grained_tag = verb.tag_
+
+    if fine_grained_tag == "VBD":
+        # was is an irregular past tense verb from third-person singular to third-person plural
+        if verb_text.lower() == 'was':
+            return capitalization_helper(verb_text, 'were')
+
+        # other past-tense verbs remain the same
+        else:
+            return None
+
+    # oftentimes, if there are 2+ verbs in a sentence, each verb after the first (the conjuncts) will be misclassified
+    # the POS of these other verbs are usually misclassified as NOUN
+    # e.g. He dances and prances and sings. --> "prances" and "sings" are conjuncts marked as NOUN (should be VERB)
+    # checking if verb ends with "s" is a band-aid fix
+    elif fine_grained_tag == "VBZ" or verb.text.endswith('s'):
+        return capitalization_helper(original=verb_text.lower(),
+                                     replacement=pluralize_present_simple(verb_text))
+
+    return None
 
 def pluralize_present_simple(lowercase_verb: str):
     """
