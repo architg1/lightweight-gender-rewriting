@@ -3,6 +3,7 @@ import spacy
 import pandas as pd
 from smart_convert import convert
 from datasets import load_dataset
+import time
 
 nlp = spacy.load("en_core_web_sm")
 
@@ -33,6 +34,7 @@ def split_and_add_sentences(text, df):
     for sentence in sentences:
         df.loc[len(df)] = [sentence.strip()]
 
+start_time = time.time()
 # Load dataset
 dataset = load_dataset("wikipedia", "20220301.simple") # dataset version
 dataset = dataset['train']
@@ -56,3 +58,6 @@ print(corpus.head(n=20))
 # Save the corpus
 corpus.to_csv('/Users/architg/Documents/GitHub/final-year-project/data/wikipedia_corpus.csv', index=False)
 print('Corpus generated!')
+end_time = time.time()
+
+print(f"Elapsed time: {(end_time - start_time)/60} seconds")
