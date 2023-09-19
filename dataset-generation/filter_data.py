@@ -31,7 +31,7 @@ def process_entry(text): # for each entry
 def split_and_add_sentences(text, df):
     sentences = text.split("EoS;")
     for sentence in sentences:
-        df.loc[len(df)] = sentence.strip()
+        df.loc[len(df)] = [sentence.strip()]
 
 # Load dataset
 dataset = load_dataset("wikipedia", "20220301.simple")
@@ -40,18 +40,18 @@ dataset = pd.DataFrame(dataset)
 print(dataset.head(n=5))
 print('Number of articles: ', len(dataset))
 
-print('processing entries started')
+# Process each entry to filter out sentences
 dataset['text'] = dataset['text'].apply(process_entry)
-print('processing entries finished')
 
 # Generate the biased corpus
 corpus = pd.DataFrame(columns=["biased"])
-dataset.map(split_and_add_sentences)
+dataset['text'].map(lambda x: split_and_add_sentences(x, corpus))
 corpus.reset_index(drop=True, inplace=True)
-pd.display(corpus)
+print(corpus.head(n=5))
 
-# Generate the unbiased corpus
+# Convert biased text into unbiased text
 corpus['unbiased'] = corpus['biased'].apply(convert)
+print(len(corpus))
 
 # Save the corpus
-corpus.to_csv('wikipedia_corpus', index=False)
+corpus.to_csv('wikipedia_corpus.csv', index=False)
