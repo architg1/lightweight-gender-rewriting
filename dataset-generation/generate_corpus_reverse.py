@@ -16,10 +16,9 @@ def process_entry(text): # for each entry
     doc = nlp(text)
     sentences = list(doc.sents)
     for sentence in sentences: # for each sentence
-        match = re.findall(pattern, sentence)
+        match = re.findall(pattern, sentence.text)
         if match:
             processed_text.append(sentence.text)  # then add it back
-            print(match)
     return 'EoS;'.join(processed_text) # return all sentences that fit our criteria
 
 # Load dataset
