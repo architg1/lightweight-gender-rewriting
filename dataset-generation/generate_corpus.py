@@ -60,4 +60,4 @@ corpus.to_csv('/Users/architg/Documents/GitHub/final-year-project/data/wikipedia
 print('Corpus generated!')
 end_time = time.time()
 
-print(f"Elapsed time: {(end_time - start_time)/60} seconds")
+print(f"Elapsed time: {(end_time - start_time)/60} minutes")
