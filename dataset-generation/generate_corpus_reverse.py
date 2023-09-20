@@ -2,6 +2,7 @@ import re
 import spacy
 import pandas as pd
 from datasets import load_dataset
+from smart_convert_reverse import convert_reverse
 
 nlp = spacy.load("en_core_web_sm")
 
