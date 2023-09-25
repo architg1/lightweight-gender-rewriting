@@ -41,23 +41,34 @@ def convert(unbiased_text):
     else:
         return biased_text_female
 
+"""
+# Test `convert` functionality
+test_string = 'In other words, when someone makes an ad hominem, they are attacking the person they are arguing against, instead of what they are saying.'
+converted_test_string = convert(test_string)
+print(test_string, converted_test_string)
+"""
+
 # Load dataset
 dataset = load_dataset("wikipedia", "20220301.simple") # dataset version
 dataset = dataset['train']
 dataset = pd.DataFrame(dataset)
+print('Dataset loaded')
 
 # Process each entry to filter out sentences
 dataset['text'] = dataset['text'].apply(process_entry)
+print('Corpus filtered')
 
 # Generate the real unbiased corpus
 corpus = pd.DataFrame(columns=["unbiased"])
 dataset['text'].map(lambda x: split_and_add_sentences(x, corpus))
 corpus.reset_index(drop=True, inplace=True)
+print('Unbiased corpus generated')
 
 # Generate the artificial biased corpus
 corpus['biased'] = corpus['unbiased'].apply(convert)
 print('Number of sentences: ', len(corpus))
 print(corpus.head(n=20))
+print('Biased corpus generated')
 
 # Save the corpus
 corpus.to_csv('/Users/architg/Documents/GitHub/final-year-project/data/wikipedia_corpus_reverse.csv', index=False)
