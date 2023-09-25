@@ -1,7 +1,7 @@
 import re
 import spacy
 import pandas as pd
-from smart_convert import convert
+from smart_convert import convert # https://github.com/googleinterns/they-them-theirs
 from datasets import load_dataset
 import time
 

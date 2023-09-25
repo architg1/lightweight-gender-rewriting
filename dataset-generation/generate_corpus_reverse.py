@@ -3,7 +3,7 @@ import spacy
 import pandas as pd
 from datasets import load_dataset
 import random
-from gfrwriter.en.manipulator import EnglishRuleBasedReverser, EnglishNormalizer
+from gfrwriter.en.manipulator import EnglishRuleBasedReverser, EnglishNormalizer # https://github.com/textshuttle/exploiting-bias-to-debias
 
 nlp = spacy.load("en_core_web_sm")
 
@@ -30,13 +30,13 @@ def split_and_add_sentences(text, df):
 
 reverser = EnglishRuleBasedReverser()
 normalizer = EnglishNormalizer('') 
-
 def convert(unbiased_text):
     
     normalized_text, _ = normalizer.normalize(unbiased_text)
     _, _, biased_text_female, biased_text_male = reverser.reverse(unbiased_text, normalized_text)
 
-    if random.randint(1, 9) >= 7: # male form 70% of the times
+    chance = random.random()
+    if chance <= 0.75: # male form 75% of the times
         return biased_text_male
     else:
         return biased_text_female

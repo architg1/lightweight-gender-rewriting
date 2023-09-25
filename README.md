@@ -13,6 +13,6 @@ Generates a parallel biased-unbiased corpus from 205,328 Wikipedia articles
 #### generate_corpus_reverse.py
 * Filters for unbiased text (target), then reverses forward augmentation  to create biased text (psuedo source)
 
-### Common Functions
+### Shared Functions
 #### filter_corpus.py
 Performs post-processing on the generated corpus
