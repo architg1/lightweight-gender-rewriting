@@ -2,7 +2,8 @@ import re
 import spacy
 import pandas as pd
 from datasets import load_dataset
-from smart_convert_reverse import convert_reverse
+import random
+from gfrwriter.en.manipulator import EnglishRuleBasedReverser, EnglishNormalizer
 
 nlp = spacy.load("en_core_web_sm")
 
@@ -22,6 +23,25 @@ def process_entry(text): # for each entry
             processed_text.append(sentence.text)  # then add it back
     return 'EoS;'.join(processed_text) # return all sentences that fit our criteria
 
+def split_and_add_sentences(text, df):
+    sentences = text.split("EoS;")
+    for sentence in sentences:
+        df.loc[len(df)] = [sentence.strip()]
+
+reverser = EnglishRuleBasedReverser()
+
+def convert(unbiased_text):
+    normalizer = EnglishNormalizer('') # Normalize the text using EnglishNormalizer
+    normalized_text, _ = normalizer.normalize(unbiased_text)
+
+    biased_text_male, _, _, _ = reverser.reverse(unbiased_text, normalized_text)
+    biased_text_female, _, female_form, _ = reverser.reverse(unbiased_text, normalized_text)
+
+    if random.randint(1, 9) >= 7:
+        return biased_text_male
+    else:
+        return biased_text_female
+
 # Load dataset
 dataset = load_dataset("wikipedia", "20220301.simple") # dataset version
 dataset = dataset['train']
@@ -29,3 +49,17 @@ dataset = pd.DataFrame(dataset)
 
 # Process each entry to filter out sentences
 dataset['text'] = dataset['text'].apply(process_entry)
+
+# Generate the real unbiased corpus
+corpus = pd.DataFrame(columns=["unbiased"])
+dataset['text'].map(lambda x: split_and_add_sentences(x, corpus))
+corpus.reset_index(drop=True, inplace=True)
+
+# Generate the artificial biased corpus
+corpus['biased'] = corpus['unbiased'].apply(convert)
+print('Number of sentences: ', len(corpus))
+print(corpus.head(n=20))
+
+# Save the corpus
+corpus.to_csv('/Users/architg/Documents/GitHub/final-year-project/data/reverse_wikipedia_corpus.csv', index=False)
+print('Corpus generated!')
