@@ -29,15 +29,14 @@ def split_and_add_sentences(text, df):
         df.loc[len(df)] = [sentence.strip()]
 
 reverser = EnglishRuleBasedReverser()
+normalizer = EnglishNormalizer('') 
 
 def convert(unbiased_text):
-    normalizer = EnglishNormalizer('') # Normalize the text using EnglishNormalizer
+    
     normalized_text, _ = normalizer.normalize(unbiased_text)
+    _, _, biased_text_female, biased_text_male = reverser.reverse(unbiased_text, normalized_text)
 
-    biased_text_male, _, _, _ = reverser.reverse(unbiased_text, normalized_text)
-    biased_text_female, _, female_form, _ = reverser.reverse(unbiased_text, normalized_text)
-
-    if random.randint(1, 9) >= 7:
+    if random.randint(1, 9) >= 7: # male form 70% of the times
         return biased_text_male
     else:
         return biased_text_female
