@@ -60,5 +60,5 @@ print('Number of sentences: ', len(corpus))
 print(corpus.head(n=20))
 
 # Save the corpus
-corpus.to_csv('/Users/architg/Documents/GitHub/final-year-project/data/reverse_wikipedia_corpus.csv', index=False)
+corpus.to_csv('/Users/architg/Documents/GitHub/final-year-project/data/wikipedia_corpus_reverse.csv', index=False)
 print('Corpus generated!')
