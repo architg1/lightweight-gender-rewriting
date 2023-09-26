@@ -14,6 +14,11 @@ generic_man_forms = r"average (person|people)|best (person|people) for the job|l
 pattern = f"({they_forms}|{gender_neutral_forms}|{unnecessary_female_forms}|{generic_man_forms})"
 
 def process_entry(text): # for each entry
+    """
+    concatenates all sentences in a given text that fulfil `pattern`
+    :param text: input article
+    :return: concatenated article with 'EOS;' as the separator
+    """
     processed_text = []
     doc = nlp(text)
     sentences = list(doc.sents)
@@ -24,6 +29,12 @@ def process_entry(text): # for each entry
     return 'EoS;'.join(processed_text) # return all sentences that fit our criteria
 
 def split_and_add_sentences(text, df):
+    """
+    fills an empty DataFrame with individual sentences from a given article as rows
+    :param text: input article
+    :param df: empty DataFrame
+    :return: filled DataFrame
+    """
     sentences = text.split("EoS;")
     for sentence in sentences:
         df.loc[len(df)] = [sentence.strip()]
@@ -31,44 +42,41 @@ def split_and_add_sentences(text, df):
 reverser = EnglishRuleBasedReverser()
 normalizer = EnglishNormalizer('') 
 def convert(unbiased_text):
-    
-    normalized_text, _ = normalizer.normalize(unbiased_text)
-    _, _, biased_text_female, biased_text_male = reverser.reverse(unbiased_text, normalized_text)
+    """
+    convert an unbiased sentence to gender-biased form
+    :param sentence: unbiased sentence
+    :return: sentence in gender-biased form
+    """
+    try:
+        normalized_text, _ = normalizer.normalize(unbiased_text)
+        _, _, biased_text_female, biased_text_male = reverser.reverse(unbiased_text, normalized_text)
 
-    chance = random.random()
-    if chance <= 0.75: # male form 75% of the times
-        return biased_text_male
-    else:
-        return biased_text_female
-
-"""
-# Test `convert` functionality
-test_string = 'In other words, when someone makes an ad hominem, they are attacking the person they are arguing against, instead of what they are saying.'
-converted_test_string = convert(test_string)
-print(test_string, converted_test_string)
-"""
+        chance = random.random()
+        if chance <= 0.75: # male form 75% of the times
+            return biased_text_male
+        else:
+            return biased_text_female
+    except:
+        return 'NA'
 
 # Load dataset
 dataset = load_dataset("wikipedia", "20220301.simple") # dataset version
 dataset = dataset['train']
 dataset = pd.DataFrame(dataset)
-print('Dataset loaded')
 
 # Process each entry to filter out sentences
 dataset['text'] = dataset['text'].apply(process_entry)
-print('Corpus filtered')
 
 # Generate the real unbiased corpus
 corpus = pd.DataFrame(columns=["unbiased"])
 dataset['text'].map(lambda x: split_and_add_sentences(x, corpus))
 corpus.reset_index(drop=True, inplace=True)
-print('Unbiased corpus generated')
+corpus.to_csv('/Users/architg/Documents/GitHub/final-year-project/data/test_reverse.csv', index=False)
 
 # Generate the artificial biased corpus
 corpus['biased'] = corpus['unbiased'].apply(convert)
 print('Number of sentences: ', len(corpus))
 print(corpus.head(n=20))
-print('Biased corpus generated')
 
 # Save the corpus
 corpus.to_csv('/Users/architg/Documents/GitHub/final-year-project/data/wikipedia_corpus_reverse.csv', index=False)

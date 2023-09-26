@@ -11,6 +11,11 @@ MALE_PRONOUNS = ['he', 'him', 'his', 'himself']
 FEMALE_PRONOUNS = ['she', 'her', 'hers', 'herself']
 
 def is_gendered(sentence):
+    """
+    checks whether a sentence follows the SNAPE criteria (1 entity and 1 gender) (Sun et. al.)
+    :param sentence: input sentence
+    :return: true if it does and false if it does not
+    """
     sentence = sentence.lower()
     contains_male = any(re.search(r'\b{}\b'.format(m_pronoun), sentence) for m_pronoun in MALE_PRONOUNS)
     contains_female = any(re.search(r'\b{}\b'.format(f_pronoun), sentence) for f_pronoun in FEMALE_PRONOUNS)
@@ -20,19 +25,31 @@ def is_gendered(sentence):
         return True
     return False
 
-def process_entry(text): # for each entry
+def process_entry(text):
+    """
+    concatenates all sentences in a given text that fulfil follow the SNAPE criteria
+    :param text: input article
+    :return: concatenated article with 'EOS;' as the separator
+    """
     processed_text = []
     doc = nlp(text)
     sentences = list(doc.sents)
-    for sentence in sentences: # for each sentence
-        if is_gendered(sentence.text) is True: # if the sentence fulfils our criteria
-            processed_text.append(sentence.text)  # then add it back
-    return 'EoS;'.join(processed_text) # return all sentences that fit our criteria
+    for sentence in sentences:
+        if is_gendered(sentence.text) is True:
+            processed_text.append(sentence.text)
+    return 'EoS;'.join(processed_text)
 
 def split_and_add_sentences(text, df):
+    """
+    fills an empty DataFrame with individual sentences from a given article as rows
+    :param text: input article
+    :param df: empty DataFrame
+    :return: filled DataFrame
+    """
     sentences = text.split("EoS;")
     for sentence in sentences:
         df.loc[len(df)] = [sentence.strip()]
+
 
 start_time = time.time()
 # Load dataset
