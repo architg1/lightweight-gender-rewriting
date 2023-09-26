@@ -3,6 +3,7 @@ import spacy
 import pandas as pd
 from datasets import load_dataset
 import random
+import time
 from gfrwriter.en.manipulator import EnglishRuleBasedReverser, EnglishNormalizer # https://github.com/textshuttle/exploiting-bias-to-debias
 
 nlp = spacy.load("en_core_web_sm")
@@ -59,6 +60,7 @@ def convert(unbiased_text):
     except:
         return 'NA'
 
+start_time = time.time()
 # Load dataset
 dataset = load_dataset("wikipedia", "20220301.simple") # dataset version
 dataset = dataset['train']
@@ -81,3 +83,6 @@ print(corpus.head(n=20))
 # Save the corpus
 corpus.to_csv('/Users/architg/Documents/GitHub/final-year-project/data/wikipedia_corpus_reverse.csv', index=False)
 print('Corpus generated!')
+end_time = time.time()
+
+print(f"Elapsed time: {(end_time - start_time)/60} minutes")
