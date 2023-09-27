@@ -15,4 +15,4 @@ Generates a parallel biased-unbiased corpus from 205,328 Wikipedia articles
 
 ### Shared Functions
 #### filter_corpus.py
-Performs post-processing on the generated corpus
+Performs post-processing on the generated corpora
