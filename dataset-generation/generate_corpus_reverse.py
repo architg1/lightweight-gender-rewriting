@@ -73,7 +73,6 @@ dataset['text'] = dataset['text'].apply(process_entry)
 corpus = pd.DataFrame(columns=["unbiased"])
 dataset['text'].map(lambda x: split_and_add_sentences(x, corpus))
 corpus.reset_index(drop=True, inplace=True)
-corpus.to_csv('/Users/architg/Documents/GitHub/final-year-project/data/test_reverse.csv', index=False)
 
 # Generate the artificial biased corpus
 corpus['biased'] = corpus['unbiased'].apply(convert)
