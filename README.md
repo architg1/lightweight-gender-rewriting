@@ -1,5 +1,5 @@
-Building gender-fair rewriting models using lightweight transformers 
 # final-year-project
+Building gender-fair rewriting models using lightweight transformers 
 
 ## dataset-generation
 Generates a parallel biased-unbiased corpus from 205,328 Wikipedia articles
